@@ -1,0 +1,12 @@
+.git
+.github
+.gradle
+.venv
+__pycache__
+*.pyc
+app
+gradle
+gradlew
+gradlew.bat
+*.apk
+university.db

@@ -14,6 +14,7 @@ import com.personaluniversity.app.ui.theme.PersonalUniversityTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        com.personaluniversity.app.data.network.RetrofitClient.initialize(this)
         enableEdgeToEdge()
         setContent {
             PersonalUniversityTheme {

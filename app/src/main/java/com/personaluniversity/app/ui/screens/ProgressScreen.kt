@@ -129,6 +129,106 @@ fun ProgressScreen() {
         TopicMasteryRow("FastAPI Architecture & Async", 0.94)
         TopicMasteryRow("Spaced Repetition & SM-2 Algorithmic Memory", 0.88)
         TopicMasteryRow("Database Engineering & ACID Properties", 0.76)
+
+        Spacer(Modifier.height(28.dp))
+
+        // Server Connection Settings Card
+        Text("BACKEND CONFIGURATION", style = AppType.eyebrow.copy(color = Gold))
+        Spacer(Modifier.height(10.dp))
+        ServerConfigCard()
+    }
+}
+
+@Composable
+private fun ServerConfigCard() {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    var showDialog by remember { mutableStateOf(false) }
+    var currentUrl by remember { mutableStateOf(com.personaluniversity.app.data.network.RetrofitClient.getBaseUrl()) }
+    var inputUrl by remember { mutableStateOf(currentUrl) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Surface, RoundedCornerShape(8.dp))
+            .border(1.dp, RuleLine, RoundedCornerShape(8.dp))
+            .padding(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text("Backend Host", style = AppType.body.copy(fontWeight = FontWeight.SemiBold))
+                Spacer(Modifier.height(2.dp))
+                Text(currentUrl, style = AppType.meta.copy(color = Gold))
+            }
+            Button(
+                onClick = {
+                    inputUrl = currentUrl
+                    showDialog = true
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = SurfaceRaised, contentColor = Gold),
+                border = androidx.compose.foundation.BorderStroke(1.dp, GoldDim),
+                shape = RoundedCornerShape(6.dp)
+            ) {
+                Text("Edit URL", fontSize = 12.sp)
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        Text(
+            "Connect to local Wi-Fi, Cloudflare Tunnel, or a 24/7 Render cloud deployment from any network.",
+            style = AppType.lede
+        )
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Configure Backend Host", style = AppType.displayCard) },
+            text = {
+                Column {
+                    Text(
+                        "Enter the URL of your ALTER backend (e.g. https://your-app.onrender.com or http://192.168.1.5:8000/):",
+                        style = AppType.lede
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = inputUrl,
+                        onValueChange = { inputUrl = it },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Gold,
+                            unfocusedBorderColor = RuleLine,
+                            focusedContainerColor = Surface,
+                            unfocusedContainerColor = Surface
+                        )
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (inputUrl.isNotBlank()) {
+                            com.personaluniversity.app.data.network.RetrofitClient.updateBaseUrl(context, inputUrl)
+                            currentUrl = com.personaluniversity.app.data.network.RetrofitClient.getBaseUrl()
+                            showDialog = false
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Gold, contentColor = Color(0xFF14100A))
+                ) {
+                    Text("Save & Connect")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("Cancel", color = TextMuted)
+                }
+            },
+            containerColor = SurfaceRaised,
+            shape = RoundedCornerShape(12.dp)
+        )
     }
 }
 
