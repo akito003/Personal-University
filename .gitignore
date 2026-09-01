@@ -37,3 +37,12 @@ google-services.json
 # Keystore files
 *.jks
 *.keystore
+
+# Python & Backend
+__pycache__/
+*.py[cod]
+.venv/
+env/
+venv/
+*.db
+*.sqlite3
