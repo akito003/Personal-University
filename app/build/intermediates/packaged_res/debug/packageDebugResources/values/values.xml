@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Personal University</string>
+    <style name="Theme.PersonalUniversity" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">#12161B</item>
+        <item name="android:windowBackground">#12161B</item>
+        <item name="android:navigationBarColor">#12161B</item>
+    </style>
+</resources>

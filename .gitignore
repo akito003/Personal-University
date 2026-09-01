@@ -1,0 +1,37 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Android Studio Navigation editor temp files
+.navigation/
+
+# Google Services (Firebase credentials)
+google-services.json
+
+# Built application files
+*.apk
+*.aab
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# Log files
+*.log
+
+# Keystore files
+*.jks
+*.keystore
