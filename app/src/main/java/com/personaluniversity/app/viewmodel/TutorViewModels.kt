@@ -25,7 +25,9 @@ class CourseListViewModel(
         viewModelScope.launch {
             repo.listCourses()
                 .onSuccess { courses.apply { clear(); addAll(it) } }
-                .onFailure { error.value = "Couldn't reach the backend. Is it running?" }
+                .onFailure {
+                    error.value = "Couldn't reach ${com.personaluniversity.app.data.network.RetrofitClient.getBaseUrl()} (${it.localizedMessage ?: "Connection failed"}). Configure the URL in Progress."
+                }
             isLoading.value = false
         }
     }

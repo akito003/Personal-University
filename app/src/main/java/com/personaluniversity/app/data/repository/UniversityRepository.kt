@@ -7,7 +7,9 @@ import com.personaluniversity.app.data.network.RetrofitClient
  * Thin wrapper around ApiService that turns exceptions into Result so
  * ViewModels don't need try/catch scattered everywhere.
  */
-class UniversityRepository(private val api: com.personaluniversity.app.data.network.ApiService = RetrofitClient.api) {
+class UniversityRepository {
+    private val api: com.personaluniversity.app.data.network.ApiService
+        get() = RetrofitClient.api
 
     suspend fun sendChat(message: String, mode: String, lessonId: Int? = null, threadId: String? = null): Result<ChatResponse> =
         runCatching { api.sendChat(ChatRequest(lessonId = lessonId, message = message, mode = mode, threadId = threadId)) }

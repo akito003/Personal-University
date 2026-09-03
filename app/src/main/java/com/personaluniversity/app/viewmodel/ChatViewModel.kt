@@ -53,7 +53,8 @@ class ChatViewModel(
                 }
                 .onFailure {
                     messages.remove(thinkingMsg)
-                    messages.add(UiMessage("assistant", "Couldn't reach the backend. Check the server is running and BASE_URL is correct."))
+                    val url = com.personaluniversity.app.data.network.RetrofitClient.getBaseUrl()
+                    messages.add(UiMessage("assistant", "Couldn't reach $url (${it.localizedMessage ?: "network error"}). You can change the host in the Progress tab."))
                 }
             isSending.value = false
         }
