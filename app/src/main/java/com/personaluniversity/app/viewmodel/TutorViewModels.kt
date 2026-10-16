@@ -104,7 +104,8 @@ class LessonViewModel(
                     courseId = courseId,
                     lessonId = lessonId,
                     topic = current.title,
-                    quiz = current.quiz
+                    quiz = current.quiz,
+                    verifiedAnswers = quizResults.associate { it.first to it.second }
                 )
             }
         }
@@ -115,6 +116,18 @@ class LessonViewModel(
             repo.answerQuiz(questionId, selected).onSuccess { result ->
                 quizResults.removeAll { it.first == questionId }
                 quizResults.add(questionId to result)
+
+                // If the lesson was completed before this answer, harvest it now too.
+                val current = lesson.value
+                if (current?.completed == true) {
+                    srsRepo.harvestFromLesson(
+                        courseId = courseId,
+                        lessonId = lessonId,
+                        topic = current.title,
+                        quiz = current.quiz,
+                        verifiedAnswers = quizResults.associate { it.first to it.second }
+                    )
+                }
             }
         }
     }
