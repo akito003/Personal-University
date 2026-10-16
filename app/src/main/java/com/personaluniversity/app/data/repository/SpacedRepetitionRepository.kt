@@ -10,6 +10,35 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.util.UUID
 
 /**
+ * Builds recall units only for quiz questions answered by the backend.
+ * The backend's correctAnswer is authoritative; option ordering is never used
+ * to infer the answer. Unanswered or malformed results are ignored.
+ */
+internal fun buildVerifiedRecallUnits(
+    courseId: Int,
+    lessonId: Int,
+    topic: String,
+    quiz: List<QuizQuestionDto>,
+    verifiedAnswers: Map<Int, QuizAnswerResponse>,
+    nowEpochMs: Long = System.currentTimeMillis()
+): List<RecallUnit> = quiz.mapNotNull { question ->
+    val verified = verifiedAnswers[question.id] ?: return@mapNotNull null
+    val answer = verified.correctAnswer.trim()
+    if (answer.isEmpty()) return@mapNotNull null
+
+    RecallUnit(
+        id = "lesson_${lessonId}_q_${question.id}",
+        question = question.question,
+        answer = answer,
+        explanation = verified.explanation ?: "Verified answer from Lesson #${lessonId}.",
+        topic = topic,
+        sourceCourseId = courseId,
+        sourceLessonId = lessonId,
+        nextReviewEpochMs = nowEpochMs
+    )
+}
+
+/**
  * Repository managing Kaizen Spaced Repetition recall units, exam syllabi,
  * and automated harvesting from completed lessons.
  */
@@ -113,25 +142,19 @@ class SpacedRepetitionRepository private constructor() {
         courseId: Int,
         lessonId: Int,
         topic: String,
-        quiz: List<QuizQuestionDto>
+        quiz: List<QuizQuestionDto>,
+        verifiedAnswers: Map<Int, QuizAnswerResponse>
     ) {
-        quiz.forEach { q ->
-            // Avoid duplicate cards
-            val cardId = "lesson_${lessonId}_q_${q.id}"
-            if (units.none { it.id == cardId }) {
-                units.add(
-                    RecallUnit(
-                        id = cardId,
-                        question = q.question,
-                        answer = q.options.firstOrNull() ?: "See lesson content",
-                        explanation = "Generated from Lesson #$lessonId check-in quiz.",
-                        topic = topic,
-                        sourceCourseId = courseId,
-                        sourceLessonId = lessonId,
-                        nextReviewEpochMs = System.currentTimeMillis() // Due immediately
-                    )
-                )
-            }
+        val candidates = buildVerifiedRecallUnits(
+            courseId = courseId,
+            lessonId = lessonId,
+            topic = topic,
+            quiz = quiz,
+            verifiedAnswers = verifiedAnswers
+        )
+        candidates.forEach { candidate ->
+            // Stable lesson/question IDs make repeated harvesting idempotent.
+            if (units.none { it.id == candidate.id }) units.add(candidate)
         }
         refreshQueue()
     }
