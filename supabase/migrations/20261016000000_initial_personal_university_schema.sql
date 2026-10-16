@@ -59,6 +59,14 @@ create index if not exists idx_chat_messages_mode_lesson_id
 create index if not exists idx_chat_messages_mode_thread_id
     on public.chat_messages(mode, thread_id, id);
 
--- This database is accessed by the FastAPI backend using a server-side
--- DATABASE_URL. Do not grant direct anonymous/authenticated access from the app.
--- Enable RLS before exposing any of these tables through the Supabase Data API.
+-- The FastAPI backend will connect server-side with DATABASE_URL. The Android
+-- app must not connect directly to these tables using an anon/publishable key.
+-- Enable RLS and remove client-role privileges as defense in depth.
+alter table public.courses enable row level security;
+alter table public.modules enable row level security;
+alter table public.lessons enable row level security;
+alter table public.quizzes enable row level security;
+alter table public.chat_messages enable row level security;
+
+revoke all on table public.courses, public.modules, public.lessons,
+    public.quizzes, public.chat_messages from anon, authenticated;
